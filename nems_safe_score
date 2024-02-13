@@ -1,0 +1,16 @@
+SELECT m.LICENSE License
+, (SELECT CASE WHEN 
+    COALESCE(fre16.Percent16, fre17.Percent17, fre18.Percent18) IS NOT NULL THEN 
+         ( COALESCE(fre16.Percent16, 0) + COALESCE(fre17.Percent17, 0) + COALESCE(fre18.Percent18, 0) ) / 
+            (CASE WHEN fre16.Percent16 IS NULL THEN 0 ELSE 1 END + 
+             CASE WHEN fre17.Percent17 IS NULL THEN 0 ELSE 1 END + 
+             CASE WHEN fre18.Percent18 IS NULL THEN 0 ELSE 1 END)
+       END
+	   ) safe_score
+from master m
+LEFT OUTER JOIN fre16
+ON m.LICENSE = fre16.License 
+LEFT OUTER JOIN fre17
+ON m.LICENSE = fre17.License 
+LEFT OUTER JOIN fre18
+ON m.LICENSE = fre18.License 
