@@ -1,0 +1,29 @@
+select m.*
+, m.”Community Score” ce18
+, safe16_18.safe_score safe16_18
+, nems17.avail_score avail17
+, nems17.price_score price17
+, nems17.quality_score qual17
+, nems17.total_score total17
+, nems15.avail_score avail15
+, nems15.price_score price15
+, nems15.quality_score qual15
+, nems15.total_score total15
+, nems13.avail_score avail13
+, nems13.price_score price13
+, nems13.quality_score qual13
+, nems13.total_score total13
+
+from master m
+LEFT JOIN 
+nems17
+on m.ID_2017 = nems17.Store_ID
+LEFT JOIN
+nems15
+on m.ID_2015 = nems15.AuditID
+LEFT JOIN
+nems13
+on m.ID_2013 = nems13.ID
+LEFT JOIN
+safe16_18
+on m.LICENSE = safe16_18.License
