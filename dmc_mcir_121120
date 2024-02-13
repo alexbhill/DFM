@@ -1,0 +1,49 @@
+— Join geom to DMC patient zips
+SELECT 
+  d."Patient ID"
+, d."Visit ID"
+, substr(d.Zipcode,0,5) zip
+, m.ZCTA5CE10 zcta 
+, d."Asthma exacerbation"
+, d."Flu Case"
+, d."Flu Tested"
+, d."vaccinated?"
+, m.geometry geom
+FROM DMC_SP d
+LEFT JOIN MI_craigslist_zips m
+ON substr(d.Zipcode,0,5) = m.ZCTA5CE10 
+
+— Join geom to MCIR zips
+SELECT 
+  d."Patient ID"
+, substr(d.ZIPCODE,0,5)
+, m.geometry mcir_geom 
+FROM MDHHS_SP d
+LEFT JOIN MI_craigslist_zips m
+ON substr(d.ZIPCODE,0,5) = m.ZCTA5CE10 
+
+— Join the two datasets and create counts
+SELECT 
+substr(d.Zipcode,0,5) zip
+, COUNT (d."Patient ID") count
+, (SELECT COUNT (d."Patient ID")
+WHERE d."vaccinated?" IS NOT NULL 
+AND d.Zipcode != m.ZIPCODE  
+) uptake
+, (SELECT COUNT (d."Patient ID")
+WHERE d."Asthma exacerbation" = '1' 
+) asthma
+, (SELECT COUNT (d."Patient ID")
+WHERE d."vaccinated?" = 'No' 
+) novacc
+, (SELECT COUNT (d."Patient ID")
+WHERE d."vaccinated?" = 'Yes' 
+) vacc
+, (SELECT COUNT (d."Patient ID")
+WHERE d."Flu Case" = '1' 
+) flu_case
+FROM DMC_SP d
+LEFT JOIN MDHHS_SP m
+ON d."Patient ID" = m."Patient ID" 
+GROUP BY  substr(d.Zipcode,0,5)  
+ORDER BY substr(d.Zipcode,0,5)  asc
